@@ -1,87 +1,91 @@
-// app/category/[id]/page.tsx
+// ホーム画面！！！！カテゴリーを選択して詳細ページに進むよ！
+
 "use client";
-import React, { useState, use, useEffect } from 'react'; // useEffectを追加
-import { ArrowLeft, Trash2, Settings, Plus, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, X } from 'lucide-react';
 import Link from 'next/link';
+import { createClient } from '@supabase/supabase-js';
 
-export default function CategoryPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
-  const decodedId = decodeURIComponent(resolvedParams.id);
+// --- Supabaseの設定（おなじみの合体！） ---
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export default function Home() {
+  const [categories, setCategories] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
 
-  // 【追加】ボタンが押されたことを強制的に画面に伝えるデバッグ用の呪文
+  // --- 1. カテゴリ一覧をSupabaseから取ってくる ---
+  const fetchCategories = async () => {
+    // itemsテーブルから、category列のデータだけを全部持ってくる
+    const { data, error } = await supabase
+      .from('items')
+      .select('category');
+
+    if (error) {
+      console.error("エラー:", error);
+    } else {
+      // 重複を消して、きれいなリストにする（Setを使うよ！）
+      const uniqueCats = Array.from(new Set(data.map(item => item.category).filter(Boolean)));
+      setCategories(uniqueCats as string[]);
+    }
+  };
+
   useEffect(() => {
-    console.log("現在のモーダルの状態:", isModalOpen);
-  }, [isModalOpen]);
-  
-  // ダミーデータ（これを後でデータベース化します）
-  const items = [
-    { name: "卵", date: "2026/03/30" },
-    { name: "鶏肉", date: "2026/03/28" },
-  ];
+    fetchCategories();
+  }, []);
 
   return (
-    <div className="min-h-screen p-6 md:p-10 font-sans relative overflow-x-hidden" 
-         style={{
-           backgroundColor: '#e6f4ea',
-           backgroundImage: 'url("https://www.transparenttextures.com/patterns/absurdity.png")',
-         }}>
-      
-      <header className="mb-12 border-b-4 border-gray-300 pb-2">
-        <h1 className="text-6xl font-extrabold text-black uppercase">{decodedId}</h1>
+    <div className="min-h-screen p-8 bg-[#fdf6e3] font-sans">
+      <header className="mb-12 border-b-8 border-black pb-4">
+        <h1 className="text-8xl font-black text-black italic tracking-tighter">MY LIST</h1>
       </header>
 
-      <main className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-        {items.map((item, index) => (
-          <div key={index} className="aspect-square bg-neutral-200 rounded-lg p-4 flex flex-col justify-between shadow-sm border border-black/5">
-            <span className="text-2xl font-bold text-black">{item.name}</span>
-            <span className="text-sm text-gray-600 font-mono">{item.date}</span>
-          </div>
+      <main className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* --- カテゴリ一覧の表示 --- */}
+        {categories.map((cat, index) => (
+          <Link href={`/category/${encodeURIComponent(cat)}`} key={index}>
+            <div className="bg-white border-4 border-black p-8 hover:bg-yellow-300 transition-colors cursor-pointer shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none">
+              <h2 className="text-4xl font-black text-black uppercase">{cat}</h2>
+            </div>
+          </Link>
         ))}
+
+        {/* --- 新規作成ボタン（タイルとして表示） --- */}
+        <div 
+          onClick={() => setIsModalOpen(true)}
+          className="bg-black text-white p-8 flex items-center justify-center cursor-pointer hover:bg-gray-800 transition-colors shadow-[12px_12px_0px_0px_rgba(200,200,200,1)]"
+        >
+          <Plus size={64} />
+        </div>
       </main>
 
-      {/* --- 入力モーダル --- */}
+      {/* --- カテゴリ追加モーダル --- */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl">
-            <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 text-gray-400"><X size={32} /></button>
-            <h2 className="text-3xl font-black mb-8 text-black">新しく追加</h2>
-            <div className="space-y-6 text-black">
-              <input type="text" className="w-full p-5 bg-gray-100 rounded-2xl text-xl outline-none" placeholder="なまえ" />
-              <input type="date" className="w-full p-5 bg-gray-100 rounded-2xl text-xl outline-none" />
-              <button className="w-full py-5 bg-black text-white font-bold rounded-2xl text-xl active:scale-95" onClick={() => setIsModalOpen(false)}>保存する</button>
-            </div>
+        <div className="fixed inset-0 z-[5000] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white border-8 border-black p-10 w-full max-w-md relative">
+            <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-black"><X size={32} /></button>
+            <h3 className="text-3xl font-black mb-6 text-black uppercase">NEW CATEGORY</h3>
+            <input 
+              type="text" 
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              className="w-full border-4 border-black p-4 text-2xl font-bold mb-6 outline-none text-black"
+              placeholder="食材 / 調味料 / お菓子"
+            />
+            {/* 新しいカテゴリを作る時は、まずはそのカテゴリ名で「空のデータ」を一個入れるか、
+              そのまま詳細ページに飛ばしちゃいましょう！ 
+            */}
+            <Link href={`/category/${encodeURIComponent(newCategory)}`}>
+              <button className="w-full bg-black text-white py-4 text-2xl font-black hover:bg-yellow-400 hover:text-black transition-colors">
+                GO!
+              </button>
+            </Link>
           </div>
         </div>
       )}
-
-      {/* --- 操作バー --- */}
-      <footer className="fixed bottom-10 right-10 z-[5000] flex flex-col items-end gap-4">
-        <div className="border-b-4 border-gray-400 w-48 mb-1"></div>
-        <div className="flex gap-4 p-3 bg-white/80 backdrop-blur-md rounded-full shadow-2xl border border-white/20">
-          <Link href="/" className="p-4 text-black active:scale-75 transition-transform"><ArrowLeft size={36} /></Link>
-          <div className="p-4 text-black active:scale-75 transition-transform cursor-pointer"><Trash2 size={36} /></div>
-          <div className="p-4 text-black active:scale-75 transition-transform cursor-pointer"><Settings size={36} /></div>
-          
-          {/* プラスボタン：iPad Chromeで確実に反応するボタン */}
-            <button onClick={() => {
-              console.log("ボタンが押されました");
-    
-    // 記事の知見：一瞬だけタイミングをずらして、ブラウザに描画を強制する
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        setIsModalOpen(true);
-      }, 0);
-    });
-  }}
-  className="p-4 bg-green-400 text-black rounded-full shadow-lg active:scale-75 transition-transform outline-none border-none"
-  style={{ cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
->
-  <Plus size={36} strokeWidth={3} />
-</button>
-        </div>
-      </footer>
     </div>
   );
 }
