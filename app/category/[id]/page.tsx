@@ -68,7 +68,7 @@ export default function CategoryPage() {
   };
 
   const handleSave = async () => {
-    if (!newItemName || !newDeadline) return alert("なまえと期限は必須だよ！");
+    if (!newItemName) return alert("名前は必須だよ！");
 
     // 送るデータを作る
     const insertData: any = {
@@ -77,6 +77,9 @@ export default function CategoryPage() {
       category: decodedId,
     };
 
+    // 期限がある時だけデータに入れる
+    if (newDeadline) insertData.deadline = newDeadline;
+    
     // 空っぽじゃない時だけ、データに入れる（これでエラーを防ぐ！）
     if (newPurchaseDate) insertData.purchase_date = newPurchaseDate;
     if (newShop) insertData.shop = newShop;
@@ -94,6 +97,7 @@ export default function CategoryPage() {
       loadData();
     }
   };
+
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
