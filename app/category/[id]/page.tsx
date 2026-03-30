@@ -73,7 +73,6 @@ export default function CategoryPage() {
     // 送るデータを作る
     const insertData: any = {
       name: newItemName,
-      deadline: newDeadline,
       category: decodedId,
     };
 
@@ -81,6 +80,7 @@ export default function CategoryPage() {
     if (newDeadline) insertData.deadline = newDeadline;
     
     // 空っぽじゃない時だけ、データに入れる（これでエラーを防ぐ！）
+    if (newDeadline) insertData.deadline = newDeadline;
     if (newPurchaseDate) insertData.purchase_date = newPurchaseDate;
     if (newShop) insertData.shop = newShop;
     if (newPrice) insertData.price = newPrice;
@@ -92,8 +92,14 @@ export default function CategoryPage() {
       console.error("保存エラー:", error);
       alert(`エラー：${error.message}`); // ← ここに具体的な原因（列がない等）が出るよ！
     } else {
+      // 成功したら画面を閉じてリセット
       setIsModalOpen(false);
-      setNewItemName(""); setNewDeadline(""); setNewPurchaseDate(""); setNewShop(""); setNewPrice(""); setNewMemo("");
+      setNewItemName(""); 
+      setNewDeadline(""); 
+      setNewPurchaseDate(""); 
+      setNewShop(""); 
+      setNewPrice(""); 
+      setNewMemo("");
       loadData();
     }
   };
@@ -229,7 +235,7 @@ export default function CategoryPage() {
             <div className="space-y-4">
               <div className="space-y-1"><label className="text-xs font-black italic ml-2">NAME *</label><input type="text" value={newItemName} onChange={(e) => setNewItemName(e.target.value)} className="w-full p-4 bg-gray-100 rounded-xl font-bold outline-none border-2 focus:border-black" placeholder="例: たまご" /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1"><label className="text-xs font-black italic ml-2">DEADLINE *</label><input type="date" value={newDeadline} onChange={(e) => setNewDeadline(e.target.value)} className="w-full p-4 bg-gray-100 rounded-xl font-bold outline-none border-2 focus:border-black" /></div>
+                <div className="space-y-1"><label className="text-xs font-black italic ml-2">DEADLINE</label><input type="date" value={newDeadline} onChange={(e) => setNewDeadline(e.target.value)} className="w-full p-4 bg-gray-100 rounded-xl font-bold outline-none border-2 focus:border-black" /></div>
                 <div className="space-y-1"><label className="text-xs font-black italic ml-2">BUY DATE</label><input type="date" value={newPurchaseDate} onChange={(e) => setNewPurchaseDate(e.target.value)} className="w-full p-4 bg-gray-100 rounded-xl font-bold outline-none border-2 focus:border-black" /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
