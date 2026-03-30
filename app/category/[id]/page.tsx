@@ -116,6 +116,11 @@ export default function CategoryPage() {
     </div>
   );
 
+  // 共通のinputスタイル（日付用）
+  const dateInputStyle = "block w-full box-border appearance-none p-4 bg-gray-100 rounded-xl font-bold outline-none border-2 border-black focus:ring-0 min-h-[58px]";
+  // 共通のinputスタイル（テキスト用）
+  const textInputStyle = "block w-full box-border p-4 bg-gray-100 rounded-xl font-bold outline-none border-2 border-black focus:ring-0 min-h-[58px]";
+
   return (
     <div className="min-h-screen p-6 md:p-10 font-sans relative" style={{ backgroundColor: '#e6f4ea', backgroundImage: 'url("https://www.transparenttextures.com/patterns/absurdity.png")' }} onClick={() => { setIsDeleteMode(false); setSelectedItem(null); }}>
       
@@ -199,7 +204,7 @@ export default function CategoryPage() {
         </div>
       )}
 
-      {/* 追加モーダル：レスポンシブ対応版 */}
+      {/* 追加モーダル：レスポンシブ & 枠幅固定版 */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={() => setIsModalOpen(false)}>
           <div className="relative bg-white w-full max-w-lg rounded-[2.5rem] p-6 md:p-8 shadow-2xl text-black border-4 border-black max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -210,37 +215,37 @@ export default function CategoryPage() {
               {/* 名前 */}
               <div className="space-y-1">
                 <label className="text-xs font-black italic ml-2">NAME *</label>
-                <input type="text" value={newItemName} onChange={(e) => setNewItemName(e.target.value)} className="w-full p-4 bg-gray-100 rounded-xl font-bold outline-none border-2 focus:border-black" placeholder="例: たまご" />
+                <input type="text" value={newItemName} onChange={(e) => setNewItemName(e.target.value)} className={textInputStyle} placeholder="例: たまご" />
               </div>
 
-              {/* 期限と購入日：スマホでは縦、iPadでは横 */}
+              {/* 期限と購入日 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs font-black italic ml-2">DEADLINE</label>
-                  <input type="date" value={newDeadline} onChange={(e) => setNewDeadline(e.target.value)} className="w-full p-4 bg-gray-100 rounded-xl font-bold outline-none border-2 focus:border-black" />
+                  <input type="date" value={newDeadline} onChange={(e) => setNewDeadline(e.target.value)} className={dateInputStyle} />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-black italic ml-2">BUY DATE</label>
-                  <input type="date" value={newPurchaseDate} onChange={(e) => setNewPurchaseDate(e.target.value)} className="w-full p-4 bg-gray-100 rounded-xl font-bold outline-none border-2 focus:border-black" />
+                  <input type="date" value={newPurchaseDate} onChange={(e) => setNewPurchaseDate(e.target.value)} className={dateInputStyle} />
                 </div>
               </div>
 
-              {/* 店と価格：スマホでは縦、iPadでは横 */}
+              {/* 店と価格 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs font-black italic ml-2">SHOP</label>
-                  <input type="text" value={newShop} onChange={(e) => setNewShop(e.target.value)} className="w-full p-4 bg-gray-100 rounded-xl font-bold outline-none border-2 focus:border-black" placeholder="例: ライフ" />
+                  <input type="text" value={newShop} onChange={(e) => setNewShop(e.target.value)} className={textInputStyle} placeholder="例: ライフ" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-black italic ml-2">PRICE</label>
-                  <input type="text" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} className="w-full p-4 bg-gray-100 rounded-xl font-bold outline-none border-2 focus:border-black" placeholder="例: 200" />
+                  <input type="text" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} className={textInputStyle} placeholder="例: 200" />
                 </div>
               </div>
 
               {/* メモ */}
               <div className="space-y-1">
                 <label className="text-xs font-black italic ml-2">MEMO</label>
-                <textarea value={newMemo} onChange={(e) => setNewMemo(e.target.value)} className="w-full p-4 bg-gray-100 rounded-xl font-bold outline-none border-2 focus:border-black h-20" placeholder="..." />
+                <textarea value={newMemo} onChange={(e) => setNewMemo(e.target.value)} className="block w-full box-border p-4 bg-gray-100 rounded-xl font-bold outline-none border-2 border-black focus:ring-0 h-24" placeholder="..." />
               </div>
 
               <button className="w-full py-5 bg-black text-white font-black rounded-2xl text-xl md:text-2xl active:scale-95 italic shadow-[0_10px_0_0_rgba(0,0,0,0.2)]" onClick={handleSave}>COMPLETE!</button>
